@@ -10,122 +10,131 @@ interface SupplyModalProps {
 
 export default function SupplyModal({ market, onClose }: SupplyModalProps) {
   const [amount, setAmount] = useState("");
-
   const parsed = parseFloat(amount) || 0;
   const isValid = parsed > 0;
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ backgroundColor: "rgba(0,0,0,0.7)" }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+      style={{
+        position: "fixed", inset: 0, zIndex: 200,
+        backgroundColor: "rgba(0,0,0,0.65)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: "16px",
       }}>
-      <div
-        className="w-full max-w-md rounded-2xl p-6"
-        style={{ backgroundColor: "var(--aave-bg-card)", border: "1px solid var(--aave-border)" }}>
+      <div style={{
+        width: "100%", maxWidth: "440px",
+        borderRadius: "16px",
+        backgroundColor: "var(--aave-bg-card)",
+        border: "1px solid var(--aave-border)",
+        padding: "28px",
+      }}>
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
-              style={{ backgroundColor: market.iconColor }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            <div style={{
+              width: "40px", height: "40px", borderRadius: "50%",
+              backgroundColor: market.iconColor,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "13px", fontWeight: 700, color: "#fff",
+            }}>
               {market.symbol.slice(0, 2)}
             </div>
             <div>
-              <h2 className="text-lg font-bold" style={{ color: "var(--aave-text-primary)" }}>
+              <div style={{ fontSize: "17px", fontWeight: 700, color: "var(--aave-text-primary)" }}>
                 Supply {market.symbol}
-              </h2>
-              <p className="text-xs" style={{ color: "var(--aave-text-secondary)" }}>
-                {market.name}
-              </p>
+              </div>
+              <div style={{ fontSize: "12px", color: "var(--aave-text-muted)" }}>{market.name}</div>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-lg"
             style={{
-              backgroundColor: "var(--aave-bg-hover)",
-              color: "var(--aave-text-secondary)",
-              cursor: "pointer",
-              border: "none",
+              width: "32px", height: "32px", borderRadius: "50%",
+              border: "none", background: "var(--aave-bg-hover)",
+              color: "var(--aave-text-secondary)", fontSize: "18px",
+              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
             }}>
             ×
           </button>
         </div>
 
-        {/* APY Info */}
-        <div
-          className="flex items-center justify-between p-4 rounded-xl mb-4"
-          style={{ backgroundColor: "var(--aave-bg-secondary)" }}>
-          <span className="text-sm" style={{ color: "var(--aave-text-secondary)" }}>
-            Supply APY
-          </span>
-          <span className="text-sm font-bold" style={{ color: "var(--aave-green)" }}>
-            {formatAPY(market.supplyAPY)}
-          </span>
+        {/* APY pill */}
+        <div style={{
+          display: "flex", justifyContent: "space-between", alignItems: "center",
+          padding: "14px 18px", borderRadius: "10px",
+          backgroundColor: "var(--aave-bg-row)",
+          border: "1px solid var(--aave-border-subtle)",
+          marginBottom: "16px",
+        }}>
+          <span style={{ fontSize: "13px", color: "var(--aave-text-secondary)" }}>Supply APY</span>
+          <span style={{ fontSize: "16px", fontWeight: 700, color: "var(--aave-green)" }}>{formatAPY(market.supplyAPY)}</span>
         </div>
 
-        {/* Amount Input */}
-        <div className="mb-4">
-          <label className="text-xs font-medium mb-2 block" style={{ color: "var(--aave-text-secondary)" }}>
+        {/* Amount input */}
+        <div style={{ marginBottom: "16px" }}>
+          <label style={{ fontSize: "12px", fontWeight: 600, color: "var(--aave-text-muted)", display: "block", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
             Amount
           </label>
-          <div
-            className="flex items-center gap-3 p-4 rounded-xl"
-            style={{ backgroundColor: "var(--aave-bg-secondary)", border: "1px solid var(--aave-border)" }}>
+          <div style={{
+            display: "flex", alignItems: "center", gap: "12px",
+            padding: "14px 18px", borderRadius: "10px",
+            backgroundColor: "var(--aave-bg-row)",
+            border: "1px solid var(--aave-border)",
+          }}>
             <input
               type="number"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
-              className="flex-1 bg-transparent text-lg font-semibold outline-none"
-              style={{ color: "var(--aave-text-primary)" }}
+              style={{
+                flex: 1, background: "transparent", border: "none", outline: "none",
+                fontSize: "18px", fontWeight: 600, color: "var(--aave-text-primary)",
+              }}
             />
-            <span className="text-sm font-medium" style={{ color: "var(--aave-text-secondary)" }}>
+            <span style={{ fontSize: "14px", fontWeight: 600, color: "var(--aave-text-secondary)" }}>
               {market.symbol}
             </span>
           </div>
         </div>
 
-        {/* Transaction Summary */}
+        {/* Summary */}
         {isValid && (
-          <div
-            className="p-4 rounded-xl mb-4 space-y-2"
-            style={{ backgroundColor: "var(--aave-bg-secondary)", border: "1px solid var(--aave-border)" }}>
-            <div className="flex justify-between text-sm">
-              <span style={{ color: "var(--aave-text-secondary)" }}>Supply amount</span>
-              <span style={{ color: "var(--aave-text-primary)" }}>
-                {parsed.toLocaleString()} {market.symbol}
-              </span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span style={{ color: "var(--aave-text-secondary)" }}>Estimated yearly earnings</span>
-              <span style={{ color: "var(--aave-green)" }}>
-                +${((parsed * market.supplyAPY) / 100).toFixed(2)}
-              </span>
-            </div>
+          <div style={{
+            padding: "14px 18px", borderRadius: "10px",
+            backgroundColor: "var(--aave-bg-row)",
+            border: "1px solid var(--aave-border-subtle)",
+            marginBottom: "16px",
+          }}>
+            {[
+              { label: "Supply amount", value: `${parsed.toLocaleString()} ${market.symbol}`, color: "var(--aave-text-primary)" },
+              { label: "Est. yearly earnings", value: `+$${((parsed * market.supplyAPY) / 100).toFixed(2)}`, color: "var(--aave-green)" },
+            ].map(({ label, value, color }) => (
+              <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0" }}>
+                <span style={{ fontSize: "13px", color: "var(--aave-text-secondary)" }}>{label}</span>
+                <span style={{ fontSize: "13px", fontWeight: 600, color }}>{value}</span>
+              </div>
+            ))}
           </div>
         )}
 
-        {/* Action Button */}
         <button
-          className="w-full py-3 rounded-xl text-sm font-semibold text-white transition-opacity"
+          disabled={!isValid}
           style={{
-            background: isValid
-              ? "linear-gradient(135deg, var(--aave-gradient-start), var(--aave-gradient-end))"
-              : "var(--aave-bg-hover)",
-            color: isValid ? "white" : "var(--aave-text-muted)",
-            cursor: isValid ? "pointer" : "not-allowed",
+            width: "100%",
+            padding: "14px",
+            borderRadius: "10px",
             border: "none",
-            opacity: isValid ? 1 : 0.7,
-          }}
-          disabled={!isValid}>
+            background: isValid ? "linear-gradient(135deg, #b6509e, #2ebac6)" : "var(--aave-bg-hover)",
+            color: isValid ? "#fff" : "var(--aave-text-muted)",
+            fontSize: "15px",
+            fontWeight: 700,
+            cursor: isValid ? "pointer" : "not-allowed",
+          }}>
           {isValid ? `Supply ${parsed.toLocaleString()} ${market.symbol}` : "Enter an amount"}
         </button>
-
-        <p className="text-xs text-center mt-3" style={{ color: "var(--aave-text-muted)" }}>
-          This is a demo — no real transactions will occur
+        <p style={{ textAlign: "center", marginTop: "12px", fontSize: "11px", color: "var(--aave-text-muted)" }}>
+          Demo only — no real transactions
         </p>
       </div>
     </div>

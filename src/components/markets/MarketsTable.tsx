@@ -9,46 +9,73 @@ interface MarketsTableProps {
 }
 
 const COLUMNS = [
-  { label: "Asset", width: "20%" },
-  { label: "Total Supply", width: "15%" },
-  { label: "Supply APY", width: "12%" },
-  { label: "Total Borrow", width: "15%" },
-  { label: "Borrow APY", width: "12%" },
-  { label: "Utilization", width: "14%" },
-  { label: "Actions", width: "12%" },
+  { label: "Asset", flex: "2" },
+  { label: "Total supplied", flex: "1.5" },
+  { label: "Supply APY", flex: "1" },
+  { label: "Total borrowed", flex: "1.5" },
+  { label: "Borrow APY", flex: "1" },
+  { label: "Utilization", flex: "1.2" },
+  { label: "", flex: "1.2" },
 ];
 
 export default function MarketsTable({ onSupply, onBorrow }: MarketsTableProps) {
   return (
-    <div
-      className="rounded-2xl overflow-hidden"
-      style={{ backgroundColor: "var(--aave-bg-card)", border: "1px solid var(--aave-border)" }}>
-      {/* Table Header */}
-      <div
-        className="grid px-6 py-4 text-xs font-semibold uppercase tracking-wider"
-        style={{
-          gridTemplateColumns: COLUMNS.map((c) => c.width).join(" "),
-          color: "var(--aave-text-secondary)",
-          borderBottom: "1px solid var(--aave-border)",
-          backgroundColor: "var(--aave-bg-secondary)",
-        }}>
-        {COLUMNS.map((col) => (
-          <div key={col.label}>{col.label}</div>
+    <div style={{
+      borderRadius: "12px",
+      backgroundColor: "var(--aave-bg-card)",
+      border: "1px solid var(--aave-border)",
+      overflow: "hidden",
+    }}>
+      {/* Section header */}
+      <div style={{
+        padding: "20px 24px 18px",
+        borderBottom: "1px solid var(--aave-border-subtle)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}>
+        <span style={{ fontWeight: 600, fontSize: "16px", color: "var(--aave-text-primary)" }}>
+          Assets
+        </span>
+        <span style={{ fontSize: "12px", color: "var(--aave-text-muted)" }}>
+          {MARKETS.length} assets
+        </span>
+      </div>
+
+      {/* Column headers */}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        padding: "12px 24px",
+        borderBottom: "1px solid var(--aave-border-subtle)",
+        gap: "16px",
+      }}>
+        {COLUMNS.map((col, i) => (
+          <div
+            key={i}
+            style={{
+              flex: col.flex,
+              fontSize: "11px",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.6px",
+              color: "var(--aave-text-muted)",
+            }}>
+            {col.label}
+          </div>
         ))}
       </div>
 
       {/* Rows */}
-      <div>
-        {MARKETS.map((market, i) => (
-          <MarketRow
-            key={market.symbol}
-            market={market}
-            isLast={i === MARKETS.length - 1}
-            onSupply={() => onSupply(market)}
-            onBorrow={() => onBorrow(market)}
-          />
-        ))}
-      </div>
+      {MARKETS.map((market, i) => (
+        <MarketRow
+          key={market.symbol}
+          market={market}
+          isLast={i === MARKETS.length - 1}
+          onSupply={() => onSupply(market)}
+          onBorrow={() => onBorrow(market)}
+        />
+      ))}
     </div>
   );
 }

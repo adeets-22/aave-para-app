@@ -1,6 +1,7 @@
 "use client";
 
-import { Market, formatCurrency, formatAPY, formatUtilization } from "@/lib/mockData";
+import { useState } from "react";
+import { Market, formatCurrency, formatAPY } from "@/lib/mockData";
 
 interface MarketRowProps {
   market: Market;
@@ -9,115 +10,155 @@ interface MarketRowProps {
   onBorrow: () => void;
 }
 
-function TokenIcon({ symbol, color }: { symbol: string; color: string }) {
-  return (
-    <div
-      className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
-      style={{ backgroundColor: color }}>
-      {symbol.slice(0, 2)}
-    </div>
-  );
-}
-
 function UtilizationBar({ value }: { value: number }) {
   const barColor =
     value > 80 ? "var(--aave-red)" : value > 60 ? "var(--aave-yellow)" : "var(--aave-teal)";
-
   return (
-    <div className="flex flex-col gap-1">
-      <span className="text-sm font-medium" style={{ color: "var(--aave-text-primary)" }}>
-        {formatUtilization(value)}
-      </span>
-      <div
-        className="h-1.5 rounded-full overflow-hidden"
-        style={{ backgroundColor: "var(--aave-border)", width: "80px" }}>
-        <div
-          className="h-full rounded-full transition-all"
-          style={{ width: `${Math.min(value, 100)}%`, backgroundColor: barColor }}
-        />
+    <div>
+      <div style={{ fontSize: "14px", fontWeight: 500, color: "var(--aave-text-primary)", marginBottom: "6px" }}>
+        {value.toFixed(1)}%
+      </div>
+      <div style={{
+        height: "4px",
+        borderRadius: "4px",
+        backgroundColor: "var(--aave-border)",
+        width: "72px",
+        overflow: "hidden",
+      }}>
+        <div style={{
+          height: "100%",
+          borderRadius: "4px",
+          backgroundColor: barColor,
+          width: `${Math.min(value, 100)}%`,
+          transition: "width 0.3s",
+        }} />
       </div>
     </div>
   );
 }
 
 export default function MarketRow({ market, isLast, onSupply, onBorrow }: MarketRowProps) {
+  const [hovered, setHovered] = useState(false);
+
   return (
     <div
-      className="grid px-6 py-4 items-center hover:opacity-90 transition-opacity"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        gridTemplateColumns: "20% 15% 12% 15% 12% 14% 12%",
-        borderBottom: isLast ? "none" : "1px solid var(--aave-border)",
-        backgroundColor: "var(--aave-bg-card)",
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLDivElement).style.backgroundColor = "var(--aave-bg-hover)";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLDivElement).style.backgroundColor = "var(--aave-bg-card)";
+        display: "flex",
+        alignItems: "center",
+        padding: "20px 24px",
+        gap: "16px",
+        borderBottom: isLast ? "none" : "1px solid var(--aave-border-subtle)",
+        backgroundColor: hovered ? "var(--aave-bg-hover)" : "transparent",
+        transition: "background-color 0.1s",
+        cursor: "default",
       }}>
-      {/* Asset */}
-      <div className="flex items-center gap-3">
-        <TokenIcon symbol={market.symbol} color={market.iconColor} />
+
+      {/* Asset — flex 2 */}
+      <div style={{ flex: "2", display: "flex", alignItems: "center", gap: "14px" }}>
+        <div style={{
+          width: "40px",
+          height: "40px",
+          borderRadius: "50%",
+          backgroundColor: market.iconColor,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: "12px",
+          fontWeight: 700,
+          color: "#fff",
+          flexShrink: 0,
+        }}>
+          {market.symbol.slice(0, 2)}
+        </div>
         <div>
-          <div className="text-sm font-semibold" style={{ color: "var(--aave-text-primary)" }}>
-            {market.symbol}
-          </div>
-          <div className="text-xs" style={{ color: "var(--aave-text-secondary)" }}>
+          <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--aave-text-primary)", marginBottom: "2px" }}>
             {market.name}
+          </div>
+          <div style={{ fontSize: "12px", color: "var(--aave-text-muted)" }}>
+            {market.symbol}
           </div>
         </div>
       </div>
 
-      {/* Total Supply */}
-      <div className="text-sm font-medium" style={{ color: "var(--aave-text-primary)" }}>
-        {formatCurrency(market.totalSupply)}
+      {/* Total supplied — flex 1.5 */}
+      <div style={{ flex: "1.5" }}>
+        <div style={{ fontSize: "14px", fontWeight: 500, color: "var(--aave-text-primary)", marginBottom: "2px" }}>
+          {formatCurrency(market.totalSupply)}
+        </div>
+        <div style={{ fontSize: "12px", color: "var(--aave-text-muted)" }}>
+          {(market.totalSupply / 1_000_000).toFixed(2)}M {market.symbol}
+        </div>
       </div>
 
-      {/* Supply APY */}
-      <div className="text-sm font-semibold" style={{ color: "var(--aave-green)" }}>
-        {formatAPY(market.supplyAPY)}
+      {/* Supply APY — flex 1 */}
+      <div style={{ flex: "1" }}>
+        <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--aave-green)" }}>
+          {formatAPY(market.supplyAPY)}
+        </div>
       </div>
 
-      {/* Total Borrow */}
-      <div className="text-sm font-medium" style={{ color: "var(--aave-text-primary)" }}>
-        {formatCurrency(market.totalBorrow)}
+      {/* Total borrowed — flex 1.5 */}
+      <div style={{ flex: "1.5" }}>
+        <div style={{ fontSize: "14px", fontWeight: 500, color: "var(--aave-text-primary)", marginBottom: "2px" }}>
+          {formatCurrency(market.totalBorrow)}
+        </div>
+        <div style={{ fontSize: "12px", color: "var(--aave-text-muted)" }}>
+          {(market.totalBorrow / 1_000_000).toFixed(2)}M {market.symbol}
+        </div>
       </div>
 
-      {/* Borrow APY */}
-      <div className="text-sm font-semibold" style={{ color: "var(--aave-yellow)" }}>
-        {formatAPY(market.borrowAPY)}
+      {/* Borrow APY — flex 1 */}
+      <div style={{ flex: "1" }}>
+        <div style={{ fontSize: "15px", fontWeight: 600, color: "var(--aave-yellow)" }}>
+          {formatAPY(market.borrowAPY)}
+        </div>
       </div>
 
-      {/* Utilization */}
-      <UtilizationBar value={market.utilizationRate} />
+      {/* Utilization — flex 1.2 */}
+      <div style={{ flex: "1.2" }}>
+        <UtilizationBar value={market.utilizationRate} />
+      </div>
 
-      {/* Actions */}
-      <div className="flex gap-2">
+      {/* Actions — flex 1.2 */}
+      <div style={{ flex: "1.2", display: "flex", gap: "8px" }}>
         <button
           onClick={onSupply}
-          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-white transition-opacity hover:opacity-80"
           style={{
-            background: "linear-gradient(135deg, var(--aave-gradient-start), var(--aave-gradient-end))",
+            padding: "8px 16px",
+            borderRadius: "6px",
+            border: "none",
+            background: "linear-gradient(135deg, #b6509e, #2ebac6)",
+            color: "#fff",
+            fontWeight: 600,
+            fontSize: "13px",
             cursor: "pointer",
+            whiteSpace: "nowrap",
           }}>
           Supply
         </button>
         <button
           onClick={onBorrow}
-          className="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
           style={{
-            backgroundColor: "var(--aave-bg-hover)",
-            color: "var(--aave-text-primary)",
+            padding: "8px 16px",
+            borderRadius: "6px",
             border: "1px solid var(--aave-border)",
+            background: "transparent",
+            color: "var(--aave-text-secondary)",
+            fontWeight: 600,
+            fontSize: "13px",
             cursor: "pointer",
+            whiteSpace: "nowrap",
+            transition: "border-color 0.15s, color 0.15s",
           }}
           onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--aave-teal)";
-            (e.currentTarget as HTMLButtonElement).style.color = "var(--aave-teal)";
+            e.currentTarget.style.borderColor = "var(--aave-teal)";
+            e.currentTarget.style.color = "var(--aave-teal)";
           }}
           onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--aave-border)";
-            (e.currentTarget as HTMLButtonElement).style.color = "var(--aave-text-primary)";
+            e.currentTarget.style.borderColor = "var(--aave-border)";
+            e.currentTarget.style.color = "var(--aave-text-secondary)";
           }}>
           Borrow
         </button>

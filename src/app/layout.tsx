@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "@getpara/react-sdk/styles.css";
 import ParaProvider from "@/components/para/ParaProvider";
 
 export const metadata: Metadata = {

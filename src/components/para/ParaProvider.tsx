@@ -2,7 +2,6 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ParaProvider as ParaSDKProvider, Environment } from "@getpara/react-sdk";
-import "@getpara/react-sdk/styles.css";
 import { useState } from "react";
 
 const PARA_API_KEY = process.env.NEXT_PUBLIC_PARA_API_KEY ?? "";
