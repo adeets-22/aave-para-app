@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+:root {
+  --aave-bg-primary: #0d0e21;
+  --aave-bg-secondary: #1a1b2e;
+  --aave-bg-card: #222436;
+  --aave-bg-hover: #2a2d4a;
+  --aave-border: #2d3061;
+  --aave-text-primary: #f1f1f3;
+  --aave-text-secondary: #8b8fa8;
+  --aave-text-muted: #585d7a;
+  --aave-purple: #b6509e;
+  --aave-teal: #2ebac6;
+  --aave-green: #46bc4b;
+  --aave-yellow: #f4ba53;
+  --aave-red: #f45a5a;
+  --aave-gradient-start: #b6509e;
+  --aave-gradient-end: #2ebac6;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  min-height: 100vh;
+  background-color: var(--aave-bg-primary);
+  color: var(--aave-text-primary);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--aave-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--aave-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--aave-text-muted);
+}
+
+/* Aave gradient text */
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--aave-gradient-start),
+    var(--aave-gradient-end)
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Aave gradient button */
+.gradient-btn {
+  background: linear-gradient(
+    135deg,
+    var(--aave-gradient-start),
+    var(--aave-gradient-end)
+  );
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.gradient-btn:hover {
+  opacity: 0.9;
+}
