@@ -5,6 +5,7 @@ import { Market, formatCurrency, formatAPY } from "@/lib/mockData";
 
 interface MarketRowProps {
   market: Market;
+  network: "mainnet" | "testnet";
   isLast: boolean;
   onSupply: () => void;
   onBorrow: () => void;
@@ -37,7 +38,7 @@ function UtilizationBar({ value }: { value: number }) {
   );
 }
 
-export default function MarketRow({ market, isLast, onSupply, onBorrow }: MarketRowProps) {
+export default function MarketRow({ market, network, isLast, onSupply, onBorrow }: MarketRowProps) {
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -122,22 +123,28 @@ export default function MarketRow({ market, isLast, onSupply, onBorrow }: Market
       </div>
 
       {/* Actions — flex 1.2 */}
-      <div style={{ flex: "1.2", display: "flex", gap: "8px" }}>
-        <button
-          onClick={onSupply}
-          style={{
-            padding: "8px 16px",
-            borderRadius: "6px",
-            border: "none",
-            background: "linear-gradient(135deg, #b6509e, #2ebac6)",
-            color: "#fff",
-            fontWeight: 600,
-            fontSize: "13px",
-            cursor: "pointer",
-            whiteSpace: "nowrap",
-          }}>
-          Supply
-        </button>
+      <div style={{ flex: "1.2", display: "flex", gap: "8px", alignItems: "center" }}>
+        {network === "testnet" && !market.isNative ? (
+          <span style={{ fontSize: "11px", color: "var(--aave-text-muted)", whiteSpace: "nowrap" }}>
+            ETH only on testnet
+          </span>
+        ) : (
+          <button
+            onClick={onSupply}
+            style={{
+              padding: "8px 16px",
+              borderRadius: "6px",
+              border: "none",
+              background: "linear-gradient(135deg, #b6509e, #2ebac6)",
+              color: "#fff",
+              fontWeight: 600,
+              fontSize: "13px",
+              cursor: "pointer",
+              whiteSpace: "nowrap",
+            }}>
+            Supply
+          </button>
+        )}
         <button
           onClick={onBorrow}
           style={{

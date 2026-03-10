@@ -4,6 +4,7 @@ import { MARKETS, Market } from "@/lib/mockData";
 import MarketRow from "./MarketRow";
 
 interface MarketsTableProps {
+  network: "mainnet" | "testnet";
   onSupply: (market: Market) => void;
   onBorrow: (market: Market) => void;
 }
@@ -18,7 +19,7 @@ const COLUMNS = [
   { label: "", flex: "1.2" },
 ];
 
-export default function MarketsTable({ onSupply, onBorrow }: MarketsTableProps) {
+export default function MarketsTable({ network, onSupply, onBorrow }: MarketsTableProps) {
   return (
     <div style={{
       borderRadius: "12px",
@@ -37,9 +38,21 @@ export default function MarketsTable({ onSupply, onBorrow }: MarketsTableProps) 
         <span style={{ fontWeight: 600, fontSize: "16px", color: "var(--aave-text-primary)" }}>
           Assets
         </span>
-        <span style={{ fontSize: "12px", color: "var(--aave-text-muted)" }}>
-          {MARKETS.length} assets
-        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <span style={{ fontSize: "12px", color: "var(--aave-text-muted)" }}>
+            {MARKETS.length} assets
+          </span>
+          <span style={{
+            padding: "2px 10px",
+            borderRadius: "20px",
+            fontSize: "11px",
+            fontWeight: 600,
+            background: network === "mainnet" ? "rgba(46,186,198,0.15)" : "rgba(234,179,8,0.15)",
+            color: network === "mainnet" ? "var(--aave-teal)" : "#d97706",
+          }}>
+            {network === "mainnet" ? "Ethereum Mainnet" : "Sepolia Testnet"}
+          </span>
+        </div>
       </div>
 
       {/* Column headers */}
@@ -71,6 +84,7 @@ export default function MarketsTable({ onSupply, onBorrow }: MarketsTableProps) 
         <MarketRow
           key={market.symbol}
           market={market}
+          network={network}
           isLast={i === MARKETS.length - 1}
           onSupply={() => onSupply(market)}
           onBorrow={() => onBorrow(market)}

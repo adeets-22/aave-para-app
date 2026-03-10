@@ -2,22 +2,11 @@
 
 import { useModal, useAccount, useWallet } from "@getpara/react-sdk";
 
-type Tab = "markets" | "dashboard";
-
 interface HeaderProps {
-  activeTab: Tab;
-  onTabChange: (tab: Tab) => void;
   isConnected: boolean;
 }
 
-const NAV_LINKS: { id: Tab | "stake" | "governance"; label: string }[] = [
-  { id: "markets", label: "Markets" },
-  { id: "dashboard", label: "Dashboard" },
-  { id: "stake", label: "Stake" },
-  { id: "governance", label: "Governance" },
-];
-
-export default function Header({ activeTab, onTabChange, isConnected }: HeaderProps) {
+export default function Header({ isConnected }: HeaderProps) {
   const { openModal } = useModal();
   const { data: wallet } = useWallet();
 
@@ -66,55 +55,6 @@ export default function Header({ activeTab, onTabChange, isConnected }: HeaderPr
             Aave
           </span>
         </div>
-
-        {/* Nav links */}
-        <nav style={{ display: "flex", alignItems: "center", gap: "4px", flex: 1 }}>
-          {NAV_LINKS.map((link) => {
-            const isActive = link.id === activeTab;
-            const isClickable = link.id === "markets" || link.id === "dashboard";
-            const isDisabled = link.id === "dashboard" && !isConnected;
-
-            return (
-              <button
-                key={link.id}
-                onClick={() => {
-                  if (isClickable && !isDisabled) onTabChange(link.id as Tab);
-                }}
-                style={{
-                  padding: "8px 16px",
-                  borderRadius: "8px",
-                  border: "none",
-                  background: isActive ? "var(--aave-bg-hover)" : "transparent",
-                  color: isActive
-                    ? "var(--aave-text-primary)"
-                    : isDisabled
-                    ? "var(--aave-text-muted)"
-                    : "var(--aave-text-secondary)",
-                  fontWeight: isActive ? 600 : 500,
-                  fontSize: "14px",
-                  cursor: isClickable && !isDisabled ? "pointer" : "default",
-                  transition: "background 0.15s, color 0.15s",
-                  whiteSpace: "nowrap",
-                }}
-                onMouseEnter={(e) => {
-                  if (isClickable && !isDisabled && !isActive) {
-                    e.currentTarget.style.background = "var(--aave-bg-hover)";
-                    e.currentTarget.style.color = "var(--aave-text-primary)";
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.background = "transparent";
-                    e.currentTarget.style.color = isDisabled
-                      ? "var(--aave-text-muted)"
-                      : "var(--aave-text-secondary)";
-                  }
-                }}>
-                {link.label}
-              </button>
-            );
-          })}
-        </nav>
 
         {/* Right actions */}
         <div style={{ display: "flex", alignItems: "center", gap: "12px", flexShrink: 0 }}>

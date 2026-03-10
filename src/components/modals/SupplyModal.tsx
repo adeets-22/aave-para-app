@@ -1,11 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { Market, formatAPY, MOCK_LENDING_POOL } from "@/lib/mockData";
-import { useClient } from "@getpara/react-sdk";
+import { Market, formatAPY, AAVE_POOL } from "@/lib/mockData";
+import { useClient, useWallet } from "@getpara/react-sdk";
 import { createParaViemClient } from "@getpara/viem-v2-integration";
 import { http } from "viem";
-import { sepolia } from "viem/chains";
+import { mainnet, sepolia } from "viem/chains";
+
+// Aave V3 WrappedTokenGatewayV3 — Sepolia
+const WETH_GATEWAY_SEPOLIA = "0x387d311e47e80b498169e6fb51d3193167d89F7D" as const;
+
+const WETH_GATEWAY_ABI = [
+  {
+    name: "depositETH",
+    type: "function",
+    inputs: [
+      { name: "pool", type: "address" },
+      { name: "onBehalfOf", type: "address" },
+      { name: "referralCode", type: "uint16" },
+    ],
+    outputs: [],
+    stateMutability: "payable",
+  },
+] as const;
 
 const ERC20_ABI = [
   {
@@ -22,18 +39,28 @@ const ERC20_ABI = [
 
 interface SupplyModalProps {
   market: Market;
+  network: "mainnet" | "testnet";
   onClose: () => void;
 }
 
-export default function SupplyModal({ market, onClose }: SupplyModalProps) {
+export default function SupplyModal({ market, network, onClose }: SupplyModalProps) {
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
   const [txHash, setTxHash] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const para = useClient();
+  const { data: wallet } = useWallet();
 
   const parsed = parseFloat(amount) || 0;
   const isValid = parsed > 0;
+
+  const chain = network === "mainnet" ? mainnet : sepolia;
+  const pool = network === "mainnet" ? AAVE_POOL.mainnet : AAVE_POOL.sepolia;
+  const tokenAddress = network === "mainnet"
+    ? (market.mainnetTokenAddress ?? market.tokenAddress)
+    : market.tokenAddress;
+  const etherscanBase = network === "mainnet" ? "https://etherscan.io" : "https://sepolia.etherscan.io";
+  const networkLabel = network === "mainnet" ? "Ethereum Mainnet" : "Sepolia Testnet";
 
   const handleSupply = async () => {
     if (!para || !isValid) return;
@@ -41,16 +68,33 @@ export default function SupplyModal({ market, onClose }: SupplyModalProps) {
     setError(null);
     try {
       const client = createParaViemClient(para, {
-        chain: sepolia,
+        chain,
         transport: http(),
       });
-      const hash = await client.writeContract({
-        address: market.tokenAddress as `0x${string}`,
-        abi: ERC20_ABI,
-        functionName: "approve",
-        args: [MOCK_LENDING_POOL, BigInt(Math.round(parsed * 1e6))],
-        chain: sepolia,
-      });
+      const value = BigInt(Math.round(parsed * 1e18));
+      const hash = market.isNative
+        ? network === "testnet"
+          ? await client.writeContract({
+              address: WETH_GATEWAY_SEPOLIA,
+              abi: WETH_GATEWAY_ABI,
+              functionName: "depositETH",
+              args: [pool, wallet?.address as `0x${string}`, 0],
+              value,
+              chain,
+            })
+          : await client.sendTransaction({
+              to: pool,
+              value,
+              chain,
+            })
+        : await client.writeContract({
+            address: tokenAddress as `0x${string}`,
+            abi: ERC20_ABI,
+            functionName: "approve",
+            args: [pool, BigInt(Math.round(parsed * 1e6))],
+            chain,
+          });
+
       setTxHash(hash);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Transaction failed");
@@ -87,8 +131,20 @@ export default function SupplyModal({ market, onClose }: SupplyModalProps) {
               {market.symbol.slice(0, 2)}
             </div>
             <div>
-              <div style={{ fontSize: "17px", fontWeight: 700, color: "var(--aave-text-primary)" }}>
-                Supply {market.symbol}
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <div style={{ fontSize: "17px", fontWeight: 700, color: "var(--aave-text-primary)" }}>
+                  Supply {market.symbol}
+                </div>
+                <span style={{
+                  padding: "2px 8px",
+                  borderRadius: "20px",
+                  fontSize: "10px",
+                  fontWeight: 600,
+                  background: network === "mainnet" ? "rgba(46,186,198,0.15)" : "rgba(234,179,8,0.15)",
+                  color: network === "mainnet" ? "var(--aave-teal)" : "#d97706",
+                }}>
+                  {networkLabel}
+                </span>
               </div>
               <div style={{ fontSize: "12px", color: "var(--aave-text-muted)" }}>{market.name}</div>
             </div>
@@ -182,7 +238,7 @@ export default function SupplyModal({ market, onClose }: SupplyModalProps) {
               Transaction submitted
             </div>
             <a
-              href={`https://sepolia.etherscan.io/tx/${txHash}`}
+              href={`${etherscanBase}/tx/${txHash}`}
               target="_blank"
               rel="noreferrer"
               style={{ fontSize: "12px", color: "var(--aave-green)", wordBreak: "break-all" }}>

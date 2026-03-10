@@ -8,12 +8,29 @@ export interface Market {
   utilizationRate: number;
   iconColor: string;
   tokenAddress: string;
+  mainnetTokenAddress?: string;
+  isNative?: boolean;
 }
 
-// Spender address for approve() calls — mock lending pool on Sepolia
-export const MOCK_LENDING_POOL = "0xAaAAaaA000000000000000000000000000000001" as const;
+// Aave V3 Pool addresses
+export const AAVE_POOL = {
+  mainnet: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2" as const,
+  sepolia: "0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951" as const,
+};
 
 export const MARKETS: Market[] = [
+  {
+    symbol: "ETH",
+    name: "Ethereum",
+    supplyAPY: 3.14,
+    borrowAPY: 4.52,
+    totalSupply: 89_400_000,
+    totalBorrow: 31_200_000,
+    utilizationRate: 34.9,
+    iconColor: "#627eea",
+    tokenAddress: "0x0000000000000000000000000000000000000000",
+    isNative: true,
+  },
   {
     symbol: "RLUSD",
     name: "Ripple USD",
@@ -23,8 +40,10 @@ export const MARKETS: Market[] = [
     totalBorrow: 22_100_000,
     utilizationRate: 45.8,
     iconColor: "#00aae4",
-    // RLUSD has no official Sepolia deployment; using USDC address as fallback
+    // RLUSD has no official Sepolia deployment; using USDC testnet address as fallback
     tokenAddress: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+    // TODO: replace with verified RLUSD mainnet address once confirmed
+    mainnetTokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
   },
   {
     symbol: "PYUSD",
@@ -36,6 +55,7 @@ export const MARKETS: Market[] = [
     utilizationRate: 47.1,
     iconColor: "#003087",
     tokenAddress: "0xCaC524BcA292aaade2DF8bD895A70bb9B1d95f80",
+    mainnetTokenAddress: "0x6c3ea9036406852006290770BEdFcAbA0e23A0e8",
   },
   {
     symbol: "USDC",
@@ -47,6 +67,7 @@ export const MARKETS: Market[] = [
     utilizationRate: 57.9,
     iconColor: "#2775ca",
     tokenAddress: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
+    mainnetTokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
   },
 ];
 
